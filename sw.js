@@ -1,4 +1,4 @@
-const CACHE = 'controle-t3p-sept-2026-v5';
+const CACHE = 'controle-t3p-sept-2026-v6';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './Manuel_T3P_Police_Municipale_Smartphone.pdf',
