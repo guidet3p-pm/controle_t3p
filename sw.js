@@ -1,8 +1,8 @@
-const CACHE = 'controle-t3p-sept-2026-v11';
+const CACHE = 'controle-t3p-sept-2026-v12';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
   './Manuel_T3P_Police_Municipale_Smartphone.pdf',
-  './images/app-icon-96.png', './images/app-icon-180.png', './images/app-icon-192.png', './images/app-icon-512.png',
+  './images/app-icon-96-v12.png', './images/app-icon-ios-v12.png', './images/app-icon-192-v12.png', './images/app-icon-512-v12.png',
   ...Array.from({length:19},(_,i)=>`./images/${String(i+1).padStart(2,'0')}.png`)
 ];
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(()=>self.skipWaiting())); });
