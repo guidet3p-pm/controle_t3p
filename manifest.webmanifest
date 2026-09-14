@@ -2,7 +2,7 @@
   "name": "Contrôle T3P — Police Municipale",
   "short_name": "Contrôle T3P",
   "description": "Outil opérationnel de contrôle Taxi, VTC, LOTI, VMDTR et CPA pour la Police Municipale.",
-  "start_url": "./?v=17",
+  "start_url": "./?v=18",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",

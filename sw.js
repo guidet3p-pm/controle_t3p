@@ -1,7 +1,7 @@
-const CACHE = 'controle-t3p-sept-2026-v17';
+const CACHE = 'controle-t3p-sept-2026-v18';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest',
-  './Guide_T3P_Police_Municipale_Smartphone_V17.pdf',
+  './Guide_controle_T3P_Police_Municipale_Smartphone_V18.pdf',
   './images/app-icon-96-v12.png', './images/app-icon-ios-v12.png', './images/app-icon-192-v12.png', './images/app-icon-512-v12.png',
   ...Array.from({length:19},(_,i)=>`./images/${String(i+1).padStart(2,'0')}.png`)
 ];
