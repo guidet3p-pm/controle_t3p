@@ -1,10 +1,1 @@
-const CACHE = 'controle-t3p-sept-2026-v23';
-const ASSETS = [
-  './', './index.html', './manifest.webmanifest',
-  './manuel-t3p.pdf',
-  './images/app-icon-96-v12.png', './images/app-icon-ios-v12.png', './images/app-icon-192-v12.png', './images/app-icon-512-v12.png',
-  ...Array.from({length:19},(_,i)=>`./images/${String(i+1).padStart(2,'0')}.png`)
-];
-self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(()=>self.skipWaiting())); });
-self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())); });
-self.addEventListener('fetch', event => { if(event.request.method !== 'GET') return; event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request).then(response => { const copy=response.clone(); caches.open(CACHE).then(c=>c.put(event.request,copy)); return response; }).catch(()=>caches.match('./index.html')))); });
+const CACHE='t3p-v24'; self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./','./index.html','./manuel-t3p.pdf','./manifest.webmanifest'])))); self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))))); self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return; e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request).then(x=>{const c=x.clone(); caches.open(CACHE).then(cc=>cc.put(e.request,c)); return x}).catch(()=>caches.match('./index.html'))));});
