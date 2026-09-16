@@ -1,1 +1,26 @@
-{"name":"Guide contrôle T3P Police Municipale","short_name":"Guide T3P PM","start_url":"./","display":"standalone","background_color":"#f4f6f8","theme_color":"#1769aa","icons":[{"src":"logo-pm.svg","sizes":"256x256","type":"image/svg+xml"}]}
+{
+  "name": "Contrôle T3P — Police Municipale",
+  "short_name": "Contrôle T3P",
+  "description": "Outil opérationnel de contrôle Taxi, VTC, LOTI, VMDTR et CPA pour la Police Municipale.",
+  "start_url": "./?v=27",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#111827",
+  "lang": "fr-FR",
+  "icons": [
+    {
+      "src": "images/app-icon-192-v12.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/app-icon-512-v12.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
