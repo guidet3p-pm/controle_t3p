@@ -1,4 +1,4 @@
-const CACHE = 'controle-t3p-sept-2026-v38';
+const CACHE = 'controle-t3p-sept-2026-v39';
 const ASSETS = [
  './','./index.html','./manifest.webmanifest',
  './images/app-icon-96-v12.png','./images/app-icon-ios-v12.png','./images/app-icon-192-v12.png','./images/app-icon-512-v12.png',
