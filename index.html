@@ -355,7 +355,7 @@ function renderFav(){
 function searchAll(q){q=q.trim().toLowerCase();const box=document.getElementById('searchResults');if(!q){box.innerHTML='';return}let out=[];DATA.natinf.filter(n=>n&&n.join(' ').toLowerCase().includes(q)).slice(0,6).forEach(n=>out.push(`<button class="action" onclick="show('natinf')"><strong>NATINF ${n[0]}</strong><span class="small">${n[2]}</span></button>`));Object.entries(DATA.checklists).forEach(([p,arr])=>arr.filter(it=>it.join(' ').toLowerCase().includes(q)).slice(0,3).forEach(it=>out.push(`<button class="action" onclick="startControl('${p}')"><strong>${p} — ${it[0]}</strong><span class="small">${it[2]}</span></button>`)));if(out.length)box.innerHTML=out.slice(0,10).join('');else box.innerHTML='<div class="small">Aucun résultat.</div>'}
 function renderResources(){document.getElementById('resourceList').innerHTML=DATA.resources.map(r=>`<div class="card"><h3>${r[0]}</h3><p>${r[2]}</p><a href="${r[1]}" target="_blank" rel="noopener" style="color:var(--accent);word-break:break-all">Ouvrir la ressource officielle</a></div>`).join('')}
 function zoom(src){const z=document.getElementById('zoomed'),g=document.getElementById('docGallery');z.src=src;z.style.display='block';g.style.display='none';g.innerHTML='';document.getElementById('overlay').classList.add('show')}
-const MANUAL_PATH='manuel/Manuel_T3P_Police_Municipale_Smartphone.pdf';
+const MANUAL_PATH='./manuel.html';
 async function checkManualAvailability(){
  const links=[document.getElementById('manualHomeLink'),document.getElementById('manualPageLink')];
  try{
