@@ -368,7 +368,14 @@ async function checkManualAvailability(){
   if(ph)ph.textContent='📖 Ouvrir le Manuel T3P'; if(pt)pt.textContent='Version smartphone — PDF ajouté dans le dossier manuel/.';
  }catch(e){}
 }
-if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=39').catch(()=>{}));}
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('./sw.js?v=40', { updateViaCache: 'none' })
+      .then(registration => registration.update())
+      .catch(() => {});
+  });
+}
 checkManualAvailability();
 window.addEventListener('error',function(e){console.error('T3P:',e.error||e.message)});
 renderFav();
