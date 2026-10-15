@@ -1,1 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10243a">
+  <title>Manuel T3P</title>
+  <style>
+    * { box-sizing: border-box; }
 
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      background: #eef2f6;
+    }
+
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      background: #10243a;
+      box-shadow: 0 2px 8px #0003;
+    }
+
+    .back {
+      display: inline-block;
+      padding: 11px 15px;
+      color: #fff;
+      background: #24527a;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .viewer {
+      position: absolute;
+      top: 58px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: white;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="back" href="./index.html">
+      ← Retour à l’application
+    </a>
+  </header>
+
+  <main class="viewer">
+    <iframe
+      src="./manuel/Manuel_T3P_Police_Municipale_Smartphone.pdf"
+      title="Manuel opérationnel de contrôle T3P">
+    </iframe>
+  </main>
+</body>
+</html>
