@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -5,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#10243a">
   <title>Manuel T3P</title>
+
   <style>
     * { box-sizing: border-box; }
 
@@ -25,6 +27,7 @@
       align-items: center;
       padding: 8px 12px;
       background: #10243a;
+      box-shadow: 0 2px 8px #0003;
     }
 
     .back {
@@ -34,6 +37,7 @@
       border-radius: 8px;
       text-decoration: none;
       font-weight: bold;
+      white-space: nowrap;
     }
 
     #viewer {
@@ -48,6 +52,7 @@
     }
 
     .page {
+      position: relative;
       margin: 0 auto 12px;
       max-width: 100%;
       background: white;
@@ -60,6 +65,27 @@
       height: auto;
     }
 
+    .annotations {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      line-height: 1;
+    }
+
+    .annotations a {
+      position: absolute;
+      display: block;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: rgba(36, 82, 122, 0.18);
+    }
+
+    .annotations a:focus-visible {
+      outline: 2px solid #24527a;
+      background: rgba(36, 82, 122, 0.12);
+    }
+
     #status {
       padding: 20px;
       text-align: center;
@@ -67,6 +93,7 @@
     }
   </style>
 </head>
+
 <body>
   <header class="topbar">
     <a class="back" href="./index.html">
@@ -79,6 +106,7 @@
   </main>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
   <script>
     const viewer = document.getElementById('viewer');
     const status = document.getElementById('status');
@@ -92,42 +120,185 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc =
           'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        const pdf = await pdfjsLib.getDocument(
-          './manuel/Manuel_T3P_Police_Municipale_Smartphone.pdf'
-        ).promise;
+        const pdf = await pdfjsLib.getDocument({
+          url: './manuel/Manuel_T3P_Police_Municipale_Smartphone.pdf'
+        }).promise;
+
+        const pages = [];
 
         status.textContent = 'Préparation du manuel…';
 
         for (let n = 1; n <= pdf.numPages; n++) {
           const page = await pdf.getPage(n);
-          const base = page.getViewport({ scale: 1 });
-          const scale = (viewer.clientWidth - 20) / base.width;
-          const ratio = window.devicePixelRatio || 1;
-          const viewport = page.getViewport({ scale: scale * ratio });
+
+          const baseViewport = page.getViewport({ scale: 1 });
+          const scale = Math.min(
+            1.8,
+            (viewer.clientWidth - 20) / baseViewport.width
+          );
+
+          const cssViewport = page.getViewport({ scale });
+          const ratio = Math.min(window.devicePixelRatio || 1, 2);
+          const renderViewport = page.getViewport({
+            scale: scale * ratio
+          });
 
           const wrapper = document.createElement('div');
           wrapper.className = 'page';
+          wrapper.style.width = cssViewport.width + 'px';
 
           const canvas = document.createElement('canvas');
-          canvas.width = Math.floor(viewport.width);
-          canvas.height = Math.floor(viewport.height);
-          canvas.style.width = (base.width * scale) + 'px';
-          canvas.style.height = (base.height * scale) + 'px';
+          canvas.width = Math.ceil(renderViewport.width);
+          canvas.height = Math.ceil(renderViewport.height);
+          canvas.style.width = cssViewport.width + 'px';
+          canvas.style.height = cssViewport.height + 'px';
+
+          const annotationLayer = document.createElement('div');
+          annotationLayer.className = 'annotations';
+          annotationLayer.style.width = cssViewport.width + 'px';
+          annotationLayer.style.height = cssViewport.height + 'px';
 
           wrapper.appendChild(canvas);
+          wrapper.appendChild(annotationLayer);
           viewer.appendChild(wrapper);
 
           await page.render({
             canvasContext: canvas.getContext('2d'),
-            viewport: viewport
+            viewport: renderViewport
           }).promise;
+
+          pages.push({
+            page,
+            wrapper,
+            annotationLayer,
+            cssViewport
+          });
         }
 
         status.remove();
+
+        async function followDestination(destination) {
+          let dest = destination;
+
+          if (typeof dest === 'string') {
+            dest = await pdf.getDestination(dest);
+          }
+
+          if (!Array.isArray(dest) || !dest.length) return;
+
+          const pageRef = dest[0];
+          let pageIndex;
+
+          if (typeof pageRef === 'number') {
+            pageIndex = pageRef;
+          } else {
+            pageIndex = await pdf.getPageIndex(pageRef);
+          }
+
+          const target = pages[pageIndex];
+
+          if (target) {
+            target.wrapper.scrollIntoView({
+              behavior: 'auto',
+              block: 'start'
+            });
+          }
+        }
+
+        for (const item of pages) {
+          const annotations = await item.page.getAnnotations({
+            intent: 'display'
+          });
+
+          for (const annotation of annotations) {
+            if (annotation.subtype !== 'Link') continue;
+
+            const rect = item.cssViewport.convertToViewportRectangle(
+              annotation.rect
+            );
+
+            const left = Math.min(rect[0], rect[2]);
+            const top = Math.min(rect[1], rect[3]);
+            const width = Math.abs(rect[2] - rect[0]);
+            const height = Math.abs(rect[3] - rect[1]);
+
+            if (width <= 0 || height <= 0) continue;
+
+            const link = document.createElement('a');
+            link.style.left = left + 'px';
+            link.style.top = top + 'px';
+            link.style.width = width + 'px';
+            link.style.height = height + 'px';
+
+            link.setAttribute(
+              'aria-label',
+              annotation.title || 'Ouvrir le lien du manuel'
+            );
+
+            if (annotation.url) {
+              link.href = annotation.url;
+              link.target = '_blank';
+              link.rel = 'noopener noreferrer';
+            } else if (annotation.dest) {
+              link.href = '#page-' + (item.page.pageNumber);
+              link.addEventListener('click', async event => {
+                event.preventDefault();
+                try {
+                  await followDestination(annotation.dest);
+                } catch (error) {
+                  console.error('Erreur de navigation PDF :', error);
+                }
+              });
+            } else if (annotation.action) {
+              link.href = '#';
+              link.addEventListener('click', async event => {
+                event.preventDefault();
+
+                try {
+                  const action = annotation.action;
+
+                  if (action === 'NextPage') {
+                    const next = pages[item.page.pageNumber];
+                    if (next) {
+                      next.wrapper.scrollIntoView({
+                        behavior: 'auto',
+                        block: 'start'
+                      });
+                    }
+                  } else if (action === 'PrevPage') {
+                    const previous = pages[item.page.pageNumber - 2];
+                    if (previous) {
+                      previous.wrapper.scrollIntoView({
+                        behavior: 'auto',
+                        block: 'start'
+                      });
+                    }
+                  } else if (action === 'FirstPage') {
+                    pages[0].wrapper.scrollIntoView({
+                      behavior: 'auto',
+                      block: 'start'
+                    });
+                  } else if (action === 'LastPage') {
+                    pages[pages.length - 1].wrapper.scrollIntoView({
+                      behavior: 'auto',
+                      block: 'start'
+                    });
+                  }
+                } catch (error) {
+                  console.error('Erreur d’action PDF :', error);
+                }
+              });
+            } else {
+              continue;
+            }
+
+            item.annotationLayer.appendChild(link);
+          }
+        }
       } catch (error) {
+        console.error(error);
         status.textContent =
           'Impossible de charger le manuel. Vérifie ta connexion Internet et réessaie.';
-        console.error(error);
       }
     }
 
