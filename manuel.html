@@ -18,42 +18,52 @@
 
     .topbar {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      inset: 0 0 auto 0;
       z-index: 10;
       height: 58px;
       display: flex;
       align-items: center;
       padding: 8px 12px;
       background: #10243a;
-      box-shadow: 0 2px 8px #0003;
     }
 
     .back {
-      display: inline-block;
       padding: 11px 15px;
-      color: #fff;
+      color: white;
       background: #24527a;
       border-radius: 8px;
       text-decoration: none;
       font-weight: bold;
     }
 
-    .viewer {
+    #viewer {
       position: absolute;
       top: 58px;
+      bottom: 0;
       left: 0;
       right: 0;
-      bottom: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 10px;
     }
 
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      display: block;
+    .page {
+      margin: 0 auto 12px;
+      max-width: 100%;
       background: white;
+      box-shadow: 0 1px 5px #0002;
+    }
+
+    .page canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    #status {
+      padding: 20px;
+      text-align: center;
+      color: #10243a;
     }
   </style>
 </head>
@@ -64,11 +74,64 @@
     </a>
   </header>
 
-  <main class="viewer">
-    <iframe
-      src="./manuel/Manuel_T3P_Police_Municipale_Smartphone.pdf"
-      title="Manuel opérationnel de contrôle T3P">
-    </iframe>
+  <main id="viewer">
+    <div id="status">Chargement du manuel…</div>
   </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    const viewer = document.getElementById('viewer');
+    const status = document.getElementById('status');
+
+    async function loadManual() {
+      try {
+        if (!window.pdfjsLib) {
+          throw new Error('Le lecteur PDF ne s’est pas chargé.');
+        }
+
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+          'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        const pdf = await pdfjsLib.getDocument(
+          './manuel/Manuel_T3P_Police_Municipale_Smartphone.pdf'
+        ).promise;
+
+        status.textContent = 'Préparation du manuel…';
+
+        for (let n = 1; n <= pdf.numPages; n++) {
+          const page = await pdf.getPage(n);
+          const base = page.getViewport({ scale: 1 });
+          const scale = (viewer.clientWidth - 20) / base.width;
+          const ratio = window.devicePixelRatio || 1;
+          const viewport = page.getViewport({ scale: scale * ratio });
+
+          const wrapper = document.createElement('div');
+          wrapper.className = 'page';
+
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.floor(viewport.width);
+          canvas.height = Math.floor(viewport.height);
+          canvas.style.width = (base.width * scale) + 'px';
+          canvas.style.height = (base.height * scale) + 'px';
+
+          wrapper.appendChild(canvas);
+          viewer.appendChild(wrapper);
+
+          await page.render({
+            canvasContext: canvas.getContext('2d'),
+            viewport: viewport
+          }).promise;
+        }
+
+        status.remove();
+      } catch (error) {
+        status.textContent =
+          'Impossible de charger le manuel. Vérifie ta connexion Internet et réessaie.';
+        console.error(error);
+      }
+    }
+
+    loadManual();
+  </script>
 </body>
 </html>
